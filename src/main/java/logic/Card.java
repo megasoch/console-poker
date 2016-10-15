@@ -14,4 +14,17 @@ public class Card {
         this.cardDenomination = cardDenomination;
         this.cardSuit = cardSuit;
     }
+
+    public CardDenomination getCardDenomination() {
+        return cardDenomination;
+    }
+
+    public CardSuit getCardSuit() {
+        return cardSuit;
+    }
+
+    @Override
+    public String toString() {
+        return cardDenomination + "_" + cardSuit;
+    }
 }

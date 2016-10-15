@@ -14,4 +14,18 @@ public class Hand {
     public void setSecondCard(Card secondCard) {
         this.secondCard = secondCard;
     }
+
+    public Card getFirstCard() {
+        return firstCard;
+    }
+
+    public Card getSecondCard() {
+        return secondCard;
+    }
+
+    @Override
+    public String toString() {
+        return firstCard.getCardDenomination().toString() + "_" + firstCard.getCardSuit().toString()
+                + " " + secondCard.getCardDenomination().toString() + "_" + secondCard.getCardSuit().toString();
+    }
 }

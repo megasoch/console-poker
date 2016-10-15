@@ -14,14 +14,14 @@ import java.util.List;
  * Created by megasoch on 12.10.2016.
  */
 public class PlayersReader {
-    public static Player[] read(String filePath) throws IOException {
+    public static List read(String filePath) throws IOException {
         List<Player> players = new LinkedList<>();
         Path path = Paths.get(filePath);
         List<String> lines = Files.readAllLines(path);
         for (String playerDescription : lines) {
             players.add(createPlayer(playerDescription));
         }
-        return (Player[]) players.toArray();
+        return players;
     }
 
     private static Player createPlayer(String playerDescription) {

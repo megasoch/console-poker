@@ -1,13 +1,17 @@
 package logic;
 
+import java.util.List;
+
 /**
  * Created by megasoch on 13.10.2016.
  */
 public interface PlayerList {
-    void nextPlayer();
-    Player getDealer();
-    Player getSmallBlindPlayer();
-    Player getBigBlindPlayer();
+    boolean nextPlayer();
     Player getCurrentPlayer();
     int size();
+    void beginBets(Player player);
+    Player getDealer();
+    void nextDealer();
+    void decreaseActivePlayersSize();
+    List<Player> getAllPlayers();
 }
