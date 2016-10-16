@@ -1,16 +1,15 @@
 package logic;
 
-import utils.PlayersReader;
+import draw.ConsoleDrawer;
+import utils.PlayersLoader;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by megasoch on 12.10.2016.
  */
 public class Game {
-    private final String PLAYERS_LIST_FILE = "src/main/resources/players.list";
     private int smallBlind;
     private int bigBlind;
     private PlayerList playerList;
@@ -18,33 +17,41 @@ public class Game {
     private Player dealer;
     private Player smallBlindPlayer;
     private int pot;
-    private Card[] table;
+    private ArrayList<Card> table;
+    private int currentBet;
 
     public Game() throws IOException {
         this.smallBlind = 10;
         this.bigBlind = 20;
         this.pot = 0;
-        this.playerList = new PlayerListImpl(PlayersReader.read(PLAYERS_LIST_FILE));
+        this.playerList = new PlayerListImpl(PlayersLoader.loadPlayers());
         this.cardDeck = new CardDeck();
         this.dealer = playerList.getCurrentPlayer();
-        this.table = new Card[5];
+        this.table = new ArrayList<>();
+        this.currentBet = 0;
     }
 
-    public void run() {
+    public void run() throws InterruptedException, IOException {
         //POT == 0
-        this.pot = 0;
+        pot = 0;
 
         //GET CARD DECK
         //SHUFFLE
         cardDeck.prepareCardDeck();
 
-        //BLINDS
-        this.playerList.nextPlayer();
-        smallBlindPlayer = playerList.getCurrentPlayer();
-        this.pot += this.playerList.getCurrentPlayer().bet(smallBlind);
+        ConsoleDrawer.draw(this);
 
-        this.playerList.nextPlayer();
-        this.pot += this.playerList.getCurrentPlayer().bet(bigBlind);
+        //BLINDS
+        playerList.nextPlayer();
+        smallBlindPlayer = playerList.getCurrentPlayer();
+        pot += playerList.getCurrentPlayer().bet(smallBlind);
+
+        playerList.nextPlayer();
+        pot += playerList.getCurrentPlayer().bet(bigBlind);
+        currentBet = bigBlind;
+
+        Thread.sleep(1000);
+        ConsoleDrawer.draw(this);
 
         //DISTRIBUTION
         distribution();
@@ -55,23 +62,29 @@ public class Game {
         makeDecisions();
 
         //FLOP
-        table[0] = cardDeck.getCard();
-        table[1] = cardDeck.getCard();
-        table[2] = cardDeck.getCard();
+        table.add(cardDeck.getCard());
+        table.add(cardDeck.getCard());
+        table.add(cardDeck.getCard());
+        Thread.sleep(1000);
+        ConsoleDrawer.draw(this);
 
         //BETS
         playerList.beginBets(smallBlindPlayer);
         makeDecisions();
 
         //TURN
-        table[3] = cardDeck.getCard();
+        table.add(cardDeck.getCard());
+        Thread.sleep(1000);
+        ConsoleDrawer.draw(this);
 
         //BETS
         playerList.beginBets(smallBlindPlayer);
         makeDecisions();
 
         //RIVER
-        table[4] = cardDeck.getCard();
+        table.add(cardDeck.getCard());
+        Thread.sleep(1000);
+        ConsoleDrawer.draw(this);
 
         //BETS
         playerList.beginBets(smallBlindPlayer);
@@ -102,7 +115,7 @@ public class Game {
 
     private void makeDecisions() {
         do {
-            playerList.getCurrentPlayer().decision();
+            pot += playerList.getCurrentPlayer().decision(currentBet);
         } while (playerList.nextPlayer());
     }
 
@@ -122,7 +135,7 @@ public class Game {
         return pot;
     }
 
-    public Card[] getTable() {
+    public ArrayList<Card> getTable() {
         return table;
     }
 }

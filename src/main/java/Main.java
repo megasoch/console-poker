@@ -1,4 +1,5 @@
 import draw.ConsoleDrawer;
+import enums.CardDenomination;
 import logic.Game;
 
 import java.io.IOException;
@@ -10,6 +11,5 @@ public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
         Game game = new Game();
         game.run();
-        ConsoleDrawer.draw(game);
     }
 }

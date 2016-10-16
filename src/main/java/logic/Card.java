@@ -25,6 +25,9 @@ public class Card {
 
     @Override
     public String toString() {
+        if (cardDenomination == null || cardSuit == null) {
+            return "";
+        }
         return cardDenomination + "_" + cardSuit;
     }
 }
