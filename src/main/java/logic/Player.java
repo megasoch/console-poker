@@ -13,8 +13,6 @@ public class Player {
     private int moneyStack;
     private int stagedBet;
     private Hand hand;
-    private boolean active; //Player in game
-    private boolean playingHand; //Player is playing his hand
     private PokerAI ai;
     private PlayerDecision playerDecision;
 
@@ -27,8 +25,6 @@ public class Player {
         this.playerType = playerType;
         this.moneyStack = 1000;
         this.stagedBet = 0;
-        this.active = true;
-        this.playingHand = true;
         this.playerDecision = PlayerDecision.PRE_BET;
     }
 
@@ -49,19 +45,14 @@ public class Player {
     }
 
     public boolean isPlayingHand() {
-        return playingHand;
-    }
-
-    public void setPlayingHand(boolean playingHand) {
-        this.playingHand = playingHand;
+        if (playerDecision.equals(PlayerDecision.FOLD)) {
+            return false;
+        }
+        return true;
     }
 
     public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
+        return moneyStack > 0;
     }
 
     public void fold() {
@@ -110,5 +101,13 @@ public class Player {
 
     public PokerAI getAi() {
         return ai;
+    }
+
+    public int getStagedBet() {
+        return stagedBet;
+    }
+
+    public PlayerDecision getPlayerDecision() {
+        return playerDecision;
     }
 }

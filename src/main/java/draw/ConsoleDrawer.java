@@ -1,5 +1,6 @@
 package draw;
 
+import enums.PlayerDecision;
 import logic.Card;
 import logic.Game;
 import logic.Player;
@@ -19,12 +20,20 @@ public class ConsoleDrawer {
 
     private static void drawPlayersList(Game game) {
         for (Player player: game.getPlayerList().getAllPlayers()) {
-            System.out.println(player.getName() + " " + player.getMoneyStack());
+            System.out.print(player.getName());
+            System.out.print(" Stack " + player.getMoneyStack());
+            System.out.print(" Decision: " + player.getPlayerDecision());
+            if (player.getPlayerDecision().equals(PlayerDecision.CHECK) || player.getPlayerDecision().equals(PlayerDecision.CALL)) {
+                System.out.print(" Staged bet: " + player.getStagedBet());
+            }
+            System.out.println();
         }
     }
 
     private static void drawTable(Game game) {
-        System.out.print("|| ");
+        if (!game.getTable().isEmpty()) {
+            System.out.print("|| ");
+        }
         for (Card card: game.getTable()) {
             System.out.print(card.toString() + " || ");
         }
