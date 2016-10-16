@@ -1,5 +1,6 @@
 package utils;
 
+import enums.CombinationType;
 import logic.Card;
 import logic.Combination;
 
@@ -13,14 +14,37 @@ import java.util.List;
 public class CombinationChecker {
     public static Combination highestCombination(List<Card> cards) {
         int[] intComb = new int[]{1, 2, 3, 4, 5};
+        List<Combination> combinations = new ArrayList<>();
         do {
             List<Card> combinationCards = new ArrayList<>();
             for (Integer id : intComb) {
                 combinationCards.add(cards.get(id - 1));
             }
-
+            CombinationType combinationType = CombinationType.HIGH_CARD;
+            if (isStraightFlush(combinationCards)) {
+                combinationType = CombinationType.STRAIGHT_FLUSH;
+            } else if (isFourOfAKind(combinationCards)) {
+                combinationType = CombinationType.FOUR_OF_A_KIND;
+            } else if(isFullHouse(combinationCards)) {
+                combinationType = CombinationType.FULL_HOUSE;
+            } else if(isFlush(combinationCards)) {
+                combinationType = CombinationType.FLUSH;
+            } else if(isStraight(combinationCards)) {
+                combinationType = CombinationType.STRAIGHT;
+            } else if (isThreeOfAKind(combinationCards)) {
+                combinationType = CombinationType.THREE_OF_A_KIND;
+            } else if (isTwoPairs(combinationCards)) {
+                combinationType = CombinationType.TWO_PAIRS;
+            } else if (isOnePair(combinationCards)) {
+                combinationType = CombinationType.ONE_PAIR;
+            }
+            Combination cmb = new Combination();
+            cmb.setCards(combinationCards);
+            cmb.setCombinationType(combinationType);
+            combinations.add(cmb);
         } while (nextCombination(intComb, cards.size()));
-        return null;
+        Collections.sort(combinations);
+        return combinations.get(combinations.size() - 1);
     }
 
     private static boolean nextCombination(int[] a, int n) {
@@ -71,5 +95,54 @@ public class CombinationChecker {
         return false;
     }
 
+    public static boolean isFullHouse(List<Card> cards) {
+        Collections.sort(cards);
+        if (cards.get(0).getCardDenomination().ordinal() == cards.get(2).getCardDenomination().ordinal() &&
+                cards.get(3).getCardDenomination().ordinal() == cards.get(4).getCardDenomination().ordinal()) {
+            return true;
+        }
+        if (cards.get(0).getCardDenomination().ordinal() == cards.get(1).getCardDenomination().ordinal() &&
+                cards.get(2).getCardDenomination().ordinal() == cards.get(4).getCardDenomination().ordinal()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isThreeOfAKind(List<Card> cards) {
+        Collections.sort(cards);
+        if (cards.get(0).getCardDenomination().ordinal() == cards.get(2).getCardDenomination().ordinal() ||
+                cards.get(1).getCardDenomination().ordinal() == cards.get(3).getCardDenomination().ordinal() ||
+                cards.get(2).getCardDenomination().ordinal() == cards.get(4).getCardDenomination().ordinal()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isTwoPairs(List<Card> cards) {
+        Collections.sort(cards);
+        if (cards.get(0).getCardDenomination().ordinal() == cards.get(1).getCardDenomination().ordinal() &&
+                cards.get(2).getCardDenomination().ordinal() == cards.get(3).getCardDenomination().ordinal()) {
+            return true;
+        }
+        if (cards.get(1).getCardDenomination().ordinal() == cards.get(2).getCardDenomination().ordinal() &&
+                cards.get(3).getCardDenomination().ordinal() == cards.get(4).getCardDenomination().ordinal()) {
+            return true;
+        }
+        if (cards.get(0).getCardDenomination().ordinal() == cards.get(1).getCardDenomination().ordinal() &&
+                cards.get(3).getCardDenomination().ordinal() == cards.get(4).getCardDenomination().ordinal()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isOnePair(List<Card> cards) {
+        Collections.sort(cards);
+        for (int i = 1; i < cards.size(); i++) {
+            if (cards.get(i - 1).getCardDenomination().ordinal() == cards.get(i).getCardDenomination().ordinal()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
