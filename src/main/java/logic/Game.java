@@ -1,10 +1,11 @@
 package logic;
 
 import draw.ConsoleDrawer;
+import utils.CombinationChecker;
 import utils.PlayersLoader;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Created by megasoch on 12.10.2016.
@@ -90,7 +91,9 @@ public class Game {
         playerList.beginBets(smallBlindPlayer);
         makeDecisions();
 
+
         //SHOWDOWN
+        roundWinners();
         //combinationChecker()
         //movePotToWinner()
 
@@ -119,12 +122,24 @@ public class Game {
         } while (playerList.nextPlayer());
     }
 
-    public int getSmallBlind() {
-        return smallBlind;
-    }
-
-    public int getBigBlind() {
-        return bigBlind;
+    private List<Player> roundWinners() {
+        Map<Combination, Player> result = new TreeMap<>();
+        List<Card> cards = new ArrayList<>();
+        cards.addAll(table);
+        for (Player player: playerList.getAllPlayers()) {
+            if (player.isPlayingHand() && player.isActive()) {
+                cards.add(player.getHand().getFirstCard());
+                cards.add(player.getHand().getSecondCard());
+                result.put(CombinationChecker.highestCombination(cards), player);
+            }
+            cards.remove(player.getHand().getFirstCard());
+            cards.remove(player.getHand().getSecondCard());
+        }
+        List<Player> winners = new ArrayList<>();
+        for (Combination combination: result.keySet()) {
+            System.out.println(combination.getCombinationType());
+        }
+        return winners;
     }
 
     public PlayerList getPlayerList() {

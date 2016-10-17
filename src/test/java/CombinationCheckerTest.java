@@ -2,7 +2,6 @@ import enums.CardDenomination;
 import enums.CardSuit;
 import enums.CombinationType;
 import logic.Card;
-import logic.Combination;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,8 +21,62 @@ public class CombinationCheckerTest extends Assert {
     private static List<Card> threeOfAKindCards;
     private static List<Card> twoPairsCards;
     private static List<Card> onePairCards;
+    private static List<Card> straightFromAceCards;
 
     private static List<Card> sevenCardStraightCards;
+
+    private static List<Card> kickerCards1;
+    private static List<Card> kickerCards2;
+
+    @Test
+    public void isStraight() {
+        assertTrue(CombinationChecker.isStraight(straightCards));
+    }
+
+    @Test
+    public void isFlush() {
+        assertTrue(CombinationChecker.isFlush(flushCards));
+    }
+
+    @Test
+    public void isFourOfAKind() {
+        assertTrue(CombinationChecker.isFourOfAKind(fourOfAKindCards));
+    }
+
+    @Test
+    public void isFullHouse() {
+        assertTrue(CombinationChecker.isFullHouse(fullHouseCards));
+    }
+
+    @Test
+    public void isThreeOfAKind() {
+        assertTrue(CombinationChecker.isThreeOfAKind(threeOfAKindCards));
+    }
+
+    @Test
+    public void isTwoPairs() {
+        assertTrue(CombinationChecker.isTwoPairs(twoPairsCards));
+    }
+
+    @Test
+    public void isOnePair() {
+        assertTrue(CombinationChecker.isOnePair(onePairCards));
+    }
+
+    @Test
+    public void isStraightFromAce() {
+        assertTrue(CombinationChecker.isStraight(straightFromAceCards));
+    }
+
+    @Test
+    public void isStraightOfSevenCards() {
+        assertEquals(CombinationType.STRAIGHT, CombinationChecker.highestCombination(sevenCardStraightCards).getCombinationType());
+    }
+
+    @Test
+    public void kickerTest() {
+        assertEquals(-1, CombinationChecker.highestCombination(kickerCards1).compareTo(CombinationChecker.highestCombination(kickerCards2)));
+    }
 
     @BeforeClass
     public static void initialize() {
@@ -76,6 +129,13 @@ public class CombinationCheckerTest extends Assert {
         onePairCards.add(new Card(CardDenomination.JACK, CardSuit.CLUBS));
         onePairCards.add(new Card(CardDenomination.ACE, CardSuit.CLUBS));
 
+        straightFromAceCards = new ArrayList<>();
+        straightFromAceCards.add(new Card(CardDenomination.ACE, CardSuit.CLUBS));
+        straightFromAceCards.add(new Card(CardDenomination.FOUR, CardSuit.CLUBS));
+        straightFromAceCards.add(new Card(CardDenomination.THREE, CardSuit.CLUBS));
+        straightFromAceCards.add(new Card(CardDenomination.TWO, CardSuit.CLUBS));
+        straightFromAceCards.add(new Card(CardDenomination.FIVE, CardSuit.CLUBS));
+
         sevenCardStraightCards = new ArrayList<>();
         sevenCardStraightCards.add(new Card(CardDenomination.JACK, CardSuit.CLUBS));
         sevenCardStraightCards.add(new Card(CardDenomination.TEN, CardSuit.HEARTS));
@@ -84,45 +144,16 @@ public class CombinationCheckerTest extends Assert {
         sevenCardStraightCards.add(new Card(CardDenomination.ACE, CardSuit.CLUBS));
         sevenCardStraightCards.add(new Card(CardDenomination.KING, CardSuit.HEARTS));
         sevenCardStraightCards.add(new Card(CardDenomination.TWO, CardSuit.CLUBS));
-    }
 
-    @Test
-    public void isStraight() {
-        assertTrue(CombinationChecker.isStraight(straightCards));
-    }
+        kickerCards1 = new ArrayList<>();
+        kickerCards1.add(new Card(CardDenomination.KING, CardSuit.CLUBS));
+        kickerCards1.add(new Card(CardDenomination.THREE, CardSuit.HEARTS));
+        kickerCards1.add(new Card(CardDenomination.FOUR, CardSuit.CLUBS));
+        kickerCards1.add(new Card(CardDenomination.TEN, CardSuit.DIAMONDS));
+        kickerCards1.add(new Card(CardDenomination.QUEEN, CardSuit.SPADES));
 
-    @Test
-    public void isFlush() {
-        assertTrue(CombinationChecker.isFlush(flushCards));
-    }
-
-    @Test
-    public void isFourOfAKind() {
-        assertTrue(CombinationChecker.isFourOfAKind(fourOfAKindCards));
-    }
-
-    @Test
-    public void isFullHouse() {
-        assertTrue(CombinationChecker.isFullHouse(fullHouseCards));
-    }
-
-    @Test
-    public void isThreeOfAKind() {
-        assertTrue(CombinationChecker.isThreeOfAKind(threeOfAKindCards));
-    }
-
-    @Test
-    public void isTwoPairs() {
-        assertTrue(CombinationChecker.isTwoPairs(twoPairsCards));
-    }
-
-    @Test
-    public void isOnePair() {
-        assertTrue(CombinationChecker.isOnePair(onePairCards));
-    }
-
-    @Test
-    public void isStraightOfSevenCards() {
-        assertEquals(CombinationType.STRAIGHT, CombinationChecker.highestCombination(sevenCardStraightCards).getCombinationType());
+        kickerCards2 = new ArrayList<>();
+        kickerCards2.addAll(kickerCards1);
+        kickerCards2.set(2, new Card(CardDenomination.FIVE, CardSuit.CLUBS));
     }
 }
