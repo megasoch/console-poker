@@ -52,7 +52,7 @@ public class PlayerListImpl implements PlayerList {
     @Override
     public int size() {
         int res = 0;
-        for (Player player: players) {
+        for (Player player : players) {
             if (player.isActive()) {
                 res++;
             }
@@ -61,10 +61,8 @@ public class PlayerListImpl implements PlayerList {
     }
 
     public void nextRound() {
-        for (Player player: players) {
-            if (player.isActive()) {
-                player.preRoundInitialize();
-            }
+        for (Player player : players) {
+            player.preRoundInitialize();
         }
         nextDealer();
         steps = 0;
@@ -87,7 +85,7 @@ public class PlayerListImpl implements PlayerList {
 
     public int inRoundPlayersSize() {
         int res = 0;
-        for (Player player: players) {
+        for (Player player : players) {
             if (player.isPlayingHand() && player.isActive()) {
                 res++;
             }
@@ -96,10 +94,10 @@ public class PlayerListImpl implements PlayerList {
     }
 
     public Player getWinner() {
-        if(inRoundPlayersSize() > 1) {
+        if (inRoundPlayersSize() > 1) {
             return null;
         }
-        for (Player player: players) {
+        for (Player player : players) {
             if (player.isPlayingHand() && player.isActive()) {
                 return player;
             }

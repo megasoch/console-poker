@@ -7,5 +7,7 @@ public enum  PlayerDecision {
     FOLD,
     CHECK,
     CALL,
-    PRE_BET
+    PRE_BET,
+    SMALL_BLIND,
+    BIG_BLIND
 }

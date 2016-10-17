@@ -2,6 +2,7 @@ package logic;
 
 import comparators.PlayerCombinationComparator;
 import draw.ConsoleDrawer;
+import enums.PlayerDecision;
 import utils.CombinationChecker;
 import utils.PlayersLoader;
 
@@ -35,6 +36,7 @@ public class Game {
 
     public void run() throws InterruptedException, IOException {
         while (playerList.size() > 1) {
+            Thread.sleep(1000);
             //GET CARD DECK
             //SHUFFLE
             cardDeck.prepareCardDeck();
@@ -44,9 +46,11 @@ public class Game {
             //BLINDS
             playerList.nextPlayer();
             smallBlindPlayer = playerList.getCurrentPlayer();
+            playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.SMALL_BLIND);
             pot += playerList.getCurrentPlayer().bet(smallBlind);
 
             playerList.nextPlayer();
+            playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.BIG_BLIND);
             pot += playerList.getCurrentPlayer().bet(bigBlind);
             currentBet = bigBlind;
 

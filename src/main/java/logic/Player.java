@@ -1,25 +1,22 @@
 package logic;
 
-import AI.PokerAI;
 import enums.PlayerDecision;
 import enums.PlayerType;
+import org.apache.log4j.Logger;
 
 /**
  * Created by megasoch on 12.10.2016.
  */
 public class Player {
+    final static Logger log = Logger.getLogger(Player.class);
+
     private String name;
     private PlayerType playerType;
     private int moneyStack;
     private int stagedBet;
     private Hand hand;
-    private PokerAI ai;
     private PlayerDecision playerDecision;
     private Combination highestCombination;
-
-    public Player() {
-        this.moneyStack = 1000;
-    }
 
     public Player(String name, PlayerType playerType) {
         this.name = name;
@@ -57,14 +54,17 @@ public class Player {
     }
 
     public void fold() {
+        log.info("Player " + name + " has FOLDED");
         playerDecision = PlayerDecision.FOLD;
     }
 
     public void check() {
+        log.info("Player " + name + " has CHECKED");
         playerDecision = PlayerDecision.CHECK;
     }
 
     public void call(int betSize) {
+        log.info("Player " + name + " has CALLED");
         playerDecision = PlayerDecision.CALL;
         stagedBet += betSize;
         moneyStack -= betSize;
@@ -72,6 +72,10 @@ public class Player {
 
     public int decision(int currentBet) {
         int addBet = currentBet - stagedBet;
+        if ((playerDecision.equals(PlayerDecision.SMALL_BLIND) || playerDecision.equals(PlayerDecision.BIG_BLIND)) && moneyStack == 0) {
+            check();
+            return 0;
+        }
         if (addBet == 0) {
             check();
             return 0;
@@ -86,17 +90,13 @@ public class Player {
 
     public void preRoundInitialize() {
         stagedBet = 0;
-        Hand hand = null;
+        hand = null;
         playerDecision = PlayerDecision.PRE_BET;
         highestCombination = null;
     }
 
     public String getName() {
         return name;
-    }
-
-    public PlayerType getPlayerType() {
-        return playerType;
     }
 
     public int getMoneyStack() {
@@ -109,10 +109,6 @@ public class Player {
 
     public Hand getHand() {
         return hand;
-    }
-
-    public PokerAI getAi() {
-        return ai;
     }
 
     public int getStagedBet() {
@@ -129,5 +125,9 @@ public class Player {
 
     public void setHighestCombination(Combination highestCombination) {
         this.highestCombination = highestCombination;
+    }
+
+    public void setPlayerDecision(PlayerDecision playerDecision) {
+        this.playerDecision = playerDecision;
     }
 }
