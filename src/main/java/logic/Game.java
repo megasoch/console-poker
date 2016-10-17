@@ -1,5 +1,6 @@
 package logic;
 
+import comparators.PlayerCombinationComparator;
 import draw.ConsoleDrawer;
 import utils.CombinationChecker;
 import utils.PlayersLoader;
@@ -33,72 +34,95 @@ public class Game {
     }
 
     public void run() throws InterruptedException, IOException {
-        //POT == 0
-        pot = 0;
+        while (playerList.size() > 1) {
+            //GET CARD DECK
+            //SHUFFLE
+            cardDeck.prepareCardDeck();
 
-        //GET CARD DECK
-        //SHUFFLE
-        cardDeck.prepareCardDeck();
+            ConsoleDrawer.draw(this);
 
-        ConsoleDrawer.draw(this);
+            //BLINDS
+            playerList.nextPlayer();
+            smallBlindPlayer = playerList.getCurrentPlayer();
+            pot += playerList.getCurrentPlayer().bet(smallBlind);
 
-        //BLINDS
-        playerList.nextPlayer();
-        smallBlindPlayer = playerList.getCurrentPlayer();
-        pot += playerList.getCurrentPlayer().bet(smallBlind);
+            playerList.nextPlayer();
+            pot += playerList.getCurrentPlayer().bet(bigBlind);
+            currentBet = bigBlind;
 
-        playerList.nextPlayer();
-        pot += playerList.getCurrentPlayer().bet(bigBlind);
-        currentBet = bigBlind;
+            //Thread.sleep(1000);
+            ConsoleDrawer.draw(this);
 
-        Thread.sleep(1000);
-        ConsoleDrawer.draw(this);
-
-        //DISTRIBUTION
-        distribution();
-
-        //BETS(PRE FLOP)
-        playerList.nextPlayer();
-        playerList.beginBets(playerList.getCurrentPlayer());
-        makeDecisions();
-
-        //FLOP
-        table.add(cardDeck.getCard());
-        table.add(cardDeck.getCard());
-        table.add(cardDeck.getCard());
-        Thread.sleep(1000);
-        ConsoleDrawer.draw(this);
-
-        //BETS
-        playerList.beginBets(smallBlindPlayer);
-        makeDecisions();
-
-        //TURN
-        table.add(cardDeck.getCard());
-        Thread.sleep(1000);
-        ConsoleDrawer.draw(this);
-
-        //BETS
-        playerList.beginBets(smallBlindPlayer);
-        makeDecisions();
-
-        //RIVER
-        table.add(cardDeck.getCard());
-        Thread.sleep(1000);
-        ConsoleDrawer.draw(this);
-
-        //BETS
-        playerList.beginBets(smallBlindPlayer);
-        makeDecisions();
+            //DISTRIBUTION
+            distribution();
 
 
-        //SHOWDOWN
-        roundWinners();
-        //combinationChecker()
-        //movePotToWinner()
+            //BETS(PRE FLOP)
+            playerList.nextPlayer();
+            playerList.beginBets(playerList.getCurrentPlayer());
+            if(!makeDecisions()) {
+                Player winner = playerList.getWinner();
+                winner.setMoneyStack(winner.getMoneyStack() + pot);
+                roundInitialization();
+                continue;
+            }
 
-        //NEW ROUND
-        //roundInitialization()
+
+            //FLOP
+            table.add(cardDeck.getCard());
+            table.add(cardDeck.getCard());
+            table.add(cardDeck.getCard());
+            //Thread.sleep(1000);
+            ConsoleDrawer.draw(this);
+
+            //BETS
+            playerList.beginBets(smallBlindPlayer);
+            if(!makeDecisions()) {
+                Player winner = playerList.getWinner();
+                winner.setMoneyStack(winner.getMoneyStack() + pot);
+                roundInitialization();
+                continue;
+            }
+
+            //TURN
+            table.add(cardDeck.getCard());
+            //Thread.sleep(1000);
+            ConsoleDrawer.draw(this);
+
+            //BETS
+            playerList.beginBets(smallBlindPlayer);
+            if(!makeDecisions()) {
+                Player winner = playerList.getWinner();
+                winner.setMoneyStack(winner.getMoneyStack() + pot);
+                roundInitialization();
+                continue;
+            }
+
+            //RIVER
+            table.add(cardDeck.getCard());
+            //Thread.sleep(1000);
+            ConsoleDrawer.draw(this);
+
+            //BETS
+            playerList.beginBets(smallBlindPlayer);
+            if(!makeDecisions()) {
+                Player winner = playerList.getWinner();
+                winner.setMoneyStack(winner.getMoneyStack() + pot);
+                roundInitialization();
+                continue;
+            }
+
+            //SHOWDOWN
+            List<Player> winners = roundWinners();
+            for (Player player: winners) {
+                System.out.println(player.getHighestCombination().getCombinationType() + " " + player.getHighestCombination());
+                player.setMoneyStack(player.getMoneyStack() + pot / winners.size());
+            }
+
+            //NEW ROUND
+            roundInitialization();
+        }
+        ConsoleDrawer.drawWinner(this);
     }
 
     private void distribution() {
@@ -116,30 +140,47 @@ public class Game {
         }
     }
 
-    private void makeDecisions() {
+    private boolean makeDecisions() {
         do {
             pot += playerList.getCurrentPlayer().decision(currentBet);
+            if (playerList.inRoundPlayersSize() == 1) {
+                return false;
+            }
         } while (playerList.nextPlayer());
+        return true;
     }
 
     private List<Player> roundWinners() {
-        Map<Combination, Player> result = new TreeMap<>();
         List<Card> cards = new ArrayList<>();
+        List<Player> winners = new ArrayList<>();
         cards.addAll(table);
         for (Player player: playerList.getAllPlayers()) {
-            if (player.isPlayingHand() && player.isActive()) {
+            if (player.isPlayingHand()) {
                 cards.add(player.getHand().getFirstCard());
                 cards.add(player.getHand().getSecondCard());
-                result.put(CombinationChecker.highestCombination(cards), player);
+                player.setHighestCombination(CombinationChecker.highestCombination(cards));
+                winners.add(player);
             }
             cards.remove(player.getHand().getFirstCard());
             cards.remove(player.getHand().getSecondCard());
         }
-        List<Player> winners = new ArrayList<>();
-        for (Combination combination: result.keySet()) {
-            System.out.println(combination.getCombinationType());
+        Collections.sort(winners, new PlayerCombinationComparator());
+        Collections.reverse(winners);
+        for (int i = 1; i < winners.size(); i++) {
+            if (winners.get(i).getHighestCombination().compareTo(winners.get(i - 1).getHighestCombination()) != 0) {
+                winners = winners.subList(0, i);
+            }
         }
         return winners;
+    }
+
+    private void roundInitialization() {
+        smallBlind = smallBlind * 2;
+        bigBlind = bigBlind * 2;
+        playerList.nextRound();
+        pot = 0;
+        table.clear();
+        currentBet = 0;
     }
 
     public PlayerList getPlayerList() {

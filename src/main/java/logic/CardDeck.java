@@ -5,7 +5,6 @@ import enums.CardSuit;
 
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by megasoch on 13.10.2016.

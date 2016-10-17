@@ -12,6 +12,8 @@ public interface PlayerList {
     void beginBets(Player player);
     Player getDealer();
     void nextDealer();
-    void decreaseActivePlayersSize();
     List<Player> getAllPlayers();
+    void nextRound();
+    int inRoundPlayersSize();
+    Player getWinner();
 }

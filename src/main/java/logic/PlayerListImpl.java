@@ -14,7 +14,6 @@ public class PlayerListImpl implements PlayerList {
     private int currentPlayerId;
     private int dealerId;
     private int steps;
-    private int activeSize;
 
     public PlayerListImpl(List players) {
         this.players = new ArrayList<>();
@@ -22,7 +21,6 @@ public class PlayerListImpl implements PlayerList {
         this.currentPlayerId = 0;
         this.steps = 0;
         this.dealerId = 0;
-        this.activeSize = players.size();
     }
 
     public void beginBets(Player player) {
@@ -53,7 +51,23 @@ public class PlayerListImpl implements PlayerList {
 
     @Override
     public int size() {
-        return activeSize;
+        int res = 0;
+        for (Player player: players) {
+            if (player.isActive()) {
+                res++;
+            }
+        }
+        return res;
+    }
+
+    public void nextRound() {
+        for (Player player: players) {
+            if (player.isActive()) {
+                player.preRoundInitialize();
+            }
+        }
+        nextDealer();
+        steps = 0;
     }
 
     public Player getDealer() {
@@ -64,13 +78,32 @@ public class PlayerListImpl implements PlayerList {
         while (!players.get((++dealerId) % players.size()).isActive()) {
         }
         dealerId = dealerId % players.size();
-    }
-
-    public void decreaseActivePlayersSize() {
-        activeSize--;
+        currentPlayerId = dealerId;
     }
 
     public List<Player> getAllPlayers() {
         return players;
+    }
+
+    public int inRoundPlayersSize() {
+        int res = 0;
+        for (Player player: players) {
+            if (player.isPlayingHand() && player.isActive()) {
+                res++;
+            }
+        }
+        return res;
+    }
+
+    public Player getWinner() {
+        if(inRoundPlayersSize() > 1) {
+            return null;
+        }
+        for (Player player: players) {
+            if (player.isPlayingHand() && player.isActive()) {
+                return player;
+            }
+        }
+        return null;
     }
 }

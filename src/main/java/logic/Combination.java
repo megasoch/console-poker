@@ -109,4 +109,13 @@ public class Combination implements Comparable {
         }
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "|| " + cards.get(0) + " ||" +
+                cards.get(1) + " ||" +
+                cards.get(2) + " ||" +
+                cards.get(3) + " ||" +
+                cards.get(4) + " ||";
+    }
 }

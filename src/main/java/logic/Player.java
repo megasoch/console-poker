@@ -15,6 +15,7 @@ public class Player {
     private Hand hand;
     private PokerAI ai;
     private PlayerDecision playerDecision;
+    private Combination highestCombination;
 
     public Player() {
         this.moneyStack = 1000;
@@ -52,7 +53,7 @@ public class Player {
     }
 
     public boolean isActive() {
-        return moneyStack > 0;
+        return stagedBet + moneyStack > 0;
     }
 
     public void fold() {
@@ -83,6 +84,13 @@ public class Player {
         return 0;
     }
 
+    public void preRoundInitialize() {
+        stagedBet = 0;
+        Hand hand = null;
+        playerDecision = PlayerDecision.PRE_BET;
+        highestCombination = null;
+    }
+
     public String getName() {
         return name;
     }
@@ -93,6 +101,10 @@ public class Player {
 
     public int getMoneyStack() {
         return moneyStack;
+    }
+
+    public void setMoneyStack(int moneyStack) {
+        this.moneyStack = moneyStack;
     }
 
     public Hand getHand() {
@@ -109,5 +121,13 @@ public class Player {
 
     public PlayerDecision getPlayerDecision() {
         return playerDecision;
+    }
+
+    public Combination getHighestCombination() {
+        return highestCombination;
+    }
+
+    public void setHighestCombination(Combination highestCombination) {
+        this.highestCombination = highestCombination;
     }
 }
