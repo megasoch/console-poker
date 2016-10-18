@@ -25,6 +25,9 @@ public class Hand {
 
     @Override
     public String toString() {
+        if (this == null) {
+            return "";
+        }
         return "|| " + firstCard + " || " + secondCard + " ||";
     }
 }

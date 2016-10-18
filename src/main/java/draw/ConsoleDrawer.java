@@ -6,6 +6,7 @@ import logic.Game;
 import logic.Player;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by megasoch on 15.10.2016.
@@ -31,11 +32,9 @@ public class ConsoleDrawer {
 
     private static void drawPlayersList(Game game) {
         for (Player player: game.getPlayerList().getAllPlayers()) {
-            System.out.print(player.getName() + "\t");
+            System.out.print(player.getName() + "\t\t");
             System.out.print(" Stack:" + player.getMoneyStack() + "\t");
-            if (player.isPlayingHand()) {
-                System.out.print(" Bet:" + player.getStagedBet() + "\t");
-            }
+            System.out.print(" Bet:" + player.getStagedBet() + "\t");
 
             if (player.equals(game.getDealer())) {
                 System.out.print(" DEALER");
@@ -67,7 +66,17 @@ public class ConsoleDrawer {
     }
 
     private static void drawPot(Game game) {
-        System.out.print("Pot:" + game.getPot() + "\t");
+        System.out.print("Pot: " + game.getPot() + "\t");
         System.out.println("Blinds: " + game.getSmallBlind() + "/" + game.getBigBlind());
+    }
+
+    public static void drawRoundWinners(List<Player> winners) {
+        System.out.println("ROUND WINNERS");
+        for (Player winner: winners) {
+            System.out.println(winner.getName() + "\t Hand: " + winner.getHand());
+            System.out.println(winner.getHighestCombination().getCombinationType() + " \t" + winner.getHighestCombination());
+        }
+        System.out.println();
+        System.out.println("=================NEW ROUND==================");
     }
 }

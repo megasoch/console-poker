@@ -47,7 +47,6 @@ public class Game {
             //GET CARD DECK
             //SHUFFLE
             cardDeck.prepareCardDeck();
-            ConsoleDrawer.draw(this);
 
             //BLINDS
             blinds();
@@ -56,6 +55,7 @@ public class Game {
             distribution();
 
             ConsoleDrawer.draw(this);
+            Thread.sleep(2000);
 
             //BETS(PRE FLOP)
             playerList.goToDealer();
@@ -73,6 +73,7 @@ public class Game {
             table.add(cardDeck.getCard());
             table.add(cardDeck.getCard());
             ConsoleDrawer.draw(this);
+            Thread.sleep(2000);
 
             //BETS
             playerList.goToDealer();
@@ -88,6 +89,7 @@ public class Game {
             //TURN
             table.add(cardDeck.getCard());
             ConsoleDrawer.draw(this);
+            Thread.sleep(2000);
 
             //BETS
             playerList.goToDealer();
@@ -103,6 +105,7 @@ public class Game {
             //RIVER
             table.add(cardDeck.getCard());
             ConsoleDrawer.draw(this);
+            Thread.sleep(2000);
 
             //BETS
             playerList.goToDealer();
@@ -117,6 +120,7 @@ public class Game {
 
             //SHOWDOWN
             distributePot(roundWinners());
+            Thread.sleep(5000);
 
             //NEW ROUND
             roundInitialization();
@@ -125,6 +129,7 @@ public class Game {
     }
 
     private void distributePot(List<Player> winners) {
+        ConsoleDrawer.drawRoundWinners(winners);
         for (Player player : winners) {
             player.setMoneyStack(player.getMoneyStack() + pot / winners.size());
         }
