@@ -2,20 +2,16 @@ package logic;
 
 import enums.PlayerDecision;
 import enums.PlayerType;
-import org.apache.log4j.Logger;
 import utils.DecisionInputer;
 
 import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 /**
  * Created by megasoch on 12.10.2016.
  */
 public class Player {
-    final static Logger log = Logger.getLogger(Player.class);
-
     private String name;
     private PlayerType playerType;
     private int moneyStack;

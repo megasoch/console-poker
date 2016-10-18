@@ -1,6 +1,5 @@
 package draw;
 
-import enums.PlayerDecision;
 import enums.PlayerType;
 import logic.Card;
 import logic.Game;
