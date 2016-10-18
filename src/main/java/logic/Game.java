@@ -17,8 +17,6 @@ public class Game {
     private int bigBlind;
     private PlayerList playerList;
     private CardDeck cardDeck;
-    private Player dealer;
-    private Player smallBlindPlayer;
     private int pot;
     private ArrayList<Card> table;
     private int currentBet;
@@ -29,7 +27,6 @@ public class Game {
         this.pot = 0;
         this.playerList = new PlayerListImpl(PlayersLoader.loadPlayers());
         this.cardDeck = new CardDeck();
-        this.dealer = playerList.getCurrentPlayer();
         this.table = new ArrayList<>();
         this.currentBet = 0;
     }
@@ -42,32 +39,16 @@ public class Game {
             //GET CARD DECK
             //SHUFFLE
             cardDeck.prepareCardDeck();
-
             ConsoleDrawer.draw(this);
 
             //BLINDS
-            playerList.nextPlayer();
-            smallBlindPlayer = playerList.getCurrentPlayer();
-            System.out.println("SB=" + playerList.getCurrentPlayer().getName());
-            playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.SMALL_BLIND);
-            pot += playerList.getCurrentPlayer().bet(smallBlind);
-
-            playerList.updateStates();
-
-            playerList.nextPlayer();
-            playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.BIG_BLIND);
-            System.out.println("BB=" + playerList.getCurrentPlayer().getName());
-            pot += playerList.getCurrentPlayer().bet(bigBlind);
-            currentBet = bigBlind;
-
-            playerList.updateStates();
+            blinds();
 
             //Thread.sleep(1000);
             ConsoleDrawer.draw(this);
 
             //DISTRIBUTION
             distribution();
-
 
             //BETS(PRE FLOP)
             playerList.goToDealer();
@@ -131,16 +112,37 @@ public class Game {
             playerList.updateStates();
 
             //SHOWDOWN
-            List<Player> winners = roundWinners();
-            for (Player player : winners) {
-                System.out.println(player.getHighestCombination().getCombinationType() + " " + player.getHighestCombination());
-                player.setMoneyStack(player.getMoneyStack() + pot / winners.size());
-            }
+            distributePot(roundWinners());
 
             //NEW ROUND
             roundInitialization();
         }
         ConsoleDrawer.drawWinner(this);
+    }
+
+    private void distributePot(List<Player> winners) {
+        for (Player player : winners) {
+            player.setMoneyStack(player.getMoneyStack() + pot / winners.size());
+        }
+        for (int i = 0; i < pot % winners.size(); i++) {
+            winners.get(i).setMoneyStack(winners.get(i).getMoneyStack() + 1);
+        }
+    }
+    private void blinds() {
+        playerList.nextPlayer();
+        System.out.println("SB=" + playerList.getCurrentPlayer().getName());
+        playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.SMALL_BLIND);
+        pot += playerList.getCurrentPlayer().bet(smallBlind);
+
+        playerList.updateStates();
+
+        playerList.nextPlayer();
+        playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.BIG_BLIND);
+        System.out.println("BB=" + playerList.getCurrentPlayer().getName());
+        pot += playerList.getCurrentPlayer().bet(bigBlind);
+        currentBet = bigBlind;
+
+        playerList.updateStates();
     }
 
     private void distribution() {
@@ -160,8 +162,8 @@ public class Game {
     }
 
     private boolean makeDecisions() {
-        int curretnRoundPlayersSize = playerList.inRoundPlayersSize();
-        for (int i = 0; i < curretnRoundPlayersSize; i++) {
+        int currentRoundPlayersSize = playerList.inRoundPlayersSize();
+        for (int i = 0; i < currentRoundPlayersSize; i++) {
             playerList.nextPlayer();
             pot += playerList.getCurrentPlayer().decision(currentBet);
             if (playerList.inRoundPlayersSize() == 1) {

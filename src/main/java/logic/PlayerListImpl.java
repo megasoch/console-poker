@@ -3,8 +3,6 @@ package logic;
 import enums.PlayerDecision;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -42,7 +40,7 @@ public class PlayerListImpl implements PlayerList {
     @Override
     public int size() {
         int res = 0;
-        for (Player player: players) {
+        for (Player player : players) {
             if (player.isActive()) {
                 res++;
             }
@@ -77,7 +75,7 @@ public class PlayerListImpl implements PlayerList {
 
     @Override
     public void nextRound() {
-        for (Player player: players) {
+        for (Player player : players) {
             if (player.isActive()) {
                 if (player.getMoneyStack() == 0) {
                     player.setPlayerDecision(PlayerDecision.OUT);
@@ -92,7 +90,7 @@ public class PlayerListImpl implements PlayerList {
     @Override
     public int inRoundPlayersSize() {
         int res = 0;
-        for (Player player: players) {
+        for (Player player : players) {
             if (player.isPlayingHand()) {
                 res++;
             }
@@ -102,10 +100,10 @@ public class PlayerListImpl implements PlayerList {
 
     @Override
     public Player getWinner() {
-        if(inRoundPlayersSize() > 1) {
+        if (inRoundPlayersSize() > 1) {
             return null;
         }
-        for (Player player: players) {
+        for (Player player : players) {
             if (player.isPlayingHand()) {
                 return player;
             }
@@ -115,7 +113,7 @@ public class PlayerListImpl implements PlayerList {
 
     @Override
     public void updateStates() {
-        for (Player player: players) {
+        for (Player player : players) {
             if (player.isPlayingHand() && player.getMoneyStack() == 0) {
                 player.setPlayerDecision(PlayerDecision.HAS_NO_STACK_FOR_BET);
             }
