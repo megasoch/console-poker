@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * Created by megasoch on 16.10.2016.
  */
+
 public class CombinationChecker {
     private static CardDenomination mainCardDenomination1;
     private static CardDenomination mainCardDenomination2;

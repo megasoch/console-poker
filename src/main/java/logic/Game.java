@@ -3,6 +3,7 @@ package logic;
 import comparators.PlayerCombinationComparator;
 import draw.ConsoleDrawer;
 import enums.PlayerDecision;
+import timer.BlindTimer;
 import utils.CombinationChecker;
 import utils.PlayersLoader;
 
@@ -20,6 +21,9 @@ public class Game {
     private int pot;
     private ArrayList<Card> table;
     private int currentBet;
+    private Player dealer;
+    private Player smallBlindPlayer;
+    private Player bigBlindPlayer;
 
     public Game() throws IOException {
         this.smallBlind = 10;
@@ -29,12 +33,16 @@ public class Game {
         this.cardDeck = new CardDeck();
         this.table = new ArrayList<>();
         this.currentBet = 0;
+        this.dealer = playerList.getDealer();
     }
 
 
     public void run() throws InterruptedException, IOException {
+        Timer timer = new Timer();
+        BlindTimer blindTimer = new BlindTimer();
+        timer.schedule(blindTimer, BlindTimer.getBlindTime(), BlindTimer.getBlindTime());
+
         while (playerList.size() > 1) {
-            Thread.sleep(1000);
 
             //GET CARD DECK
             //SHUFFLE
@@ -44,11 +52,10 @@ public class Game {
             //BLINDS
             blinds();
 
-            //Thread.sleep(1000);
-            ConsoleDrawer.draw(this);
-
             //DISTRIBUTION
             distribution();
+
+            ConsoleDrawer.draw(this);
 
             //BETS(PRE FLOP)
             playerList.goToDealer();
@@ -65,7 +72,6 @@ public class Game {
             table.add(cardDeck.getCard());
             table.add(cardDeck.getCard());
             table.add(cardDeck.getCard());
-            //Thread.sleep(1000);
             ConsoleDrawer.draw(this);
 
             //BETS
@@ -81,7 +87,6 @@ public class Game {
 
             //TURN
             table.add(cardDeck.getCard());
-            //Thread.sleep(1000);
             ConsoleDrawer.draw(this);
 
             //BETS
@@ -97,7 +102,6 @@ public class Game {
 
             //RIVER
             table.add(cardDeck.getCard());
-            //Thread.sleep(1000);
             ConsoleDrawer.draw(this);
 
             //BETS
@@ -130,15 +134,15 @@ public class Game {
     }
     private void blinds() {
         playerList.nextPlayer();
-        System.out.println("SB=" + playerList.getCurrentPlayer().getName());
+        smallBlindPlayer = playerList.getCurrentPlayer();
         playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.SMALL_BLIND);
         pot += playerList.getCurrentPlayer().bet(smallBlind);
 
         playerList.updateStates();
 
         playerList.nextPlayer();
+        bigBlindPlayer = playerList.getCurrentPlayer();
         playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.BIG_BLIND);
-        System.out.println("BB=" + playerList.getCurrentPlayer().getName());
         pot += playerList.getCurrentPlayer().bet(bigBlind);
         currentBet = bigBlind;
 
@@ -161,7 +165,7 @@ public class Game {
         }
     }
 
-    private boolean makeDecisions() {
+    private boolean makeDecisions() throws IOException {
         int currentRoundPlayersSize = playerList.inRoundPlayersSize();
         for (int i = 0; i < currentRoundPlayersSize; i++) {
             playerList.nextPlayer();
@@ -198,12 +202,15 @@ public class Game {
     }
 
     private void roundInitialization() {
-        smallBlind = smallBlind * 2;
-        bigBlind = bigBlind * 2;
+        smallBlind = BlindTimer.getSmallBlind();
+        bigBlind = BlindTimer.getBigBlind();
         playerList.nextRound();
         pot = 0;
         table.clear();
         currentBet = 0;
+        dealer = playerList.getDealer();
+        smallBlindPlayer = null;
+        bigBlindPlayer = null;
     }
 
     public PlayerList getPlayerList() {
@@ -216,5 +223,25 @@ public class Game {
 
     public ArrayList<Card> getTable() {
         return table;
+    }
+
+    public Player getDealer() {
+        return dealer;
+    }
+
+    public Player getSmallBlindPlayer() {
+        return smallBlindPlayer;
+    }
+
+    public Player getBigBlindPlayer() {
+        return bigBlindPlayer;
+    }
+
+    public int getSmallBlind() {
+        return smallBlind;
+    }
+
+    public int getBigBlind() {
+        return bigBlind;
     }
 }

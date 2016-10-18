@@ -3,6 +3,12 @@ package logic;
 import enums.PlayerDecision;
 import enums.PlayerType;
 import org.apache.log4j.Logger;
+import utils.DecisionInputer;
+
+import java.io.IOException;
+import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
  * Created by megasoch on 12.10.2016.
@@ -51,31 +57,52 @@ public class Player {
     }
 
     public void fold() {
-        log.info("Player " + name + " has FOLDED");
         playerDecision = PlayerDecision.FOLD;
     }
 
     public void check() {
-        log.info("Player " + name + " has CHECKED");
         playerDecision = PlayerDecision.CHECK;
     }
 
     public void call(int betSize) {
-        log.info("Player " + name + " has CALLED");
         playerDecision = PlayerDecision.CALL;
         stagedBet += betSize;
         moneyStack -= betSize;
     }
 
-    public int decision(int currentBet) {
+    public int decision(int currentBet) throws IOException {
         int addBet = currentBet - stagedBet;
+
         if (playerDecision.equals(PlayerDecision.HAS_NO_STACK_FOR_BET)) {
             return 0;
         }
+
         if (addBet == 0) {
             check();
             return 0;
         }
+
+        if(playerType.equals(PlayerType.PLAYER)) {
+            try {
+                switch (DecisionInputer.decision(addBet, moneyStack)) {
+                    case FOLD:
+                        fold();
+                        return 0;
+                    case CHECK:
+                        check();
+                        return 0;
+                    case CALL:
+                        call(addBet);
+                        return addBet;
+                }
+            } catch (InputMismatchException e) {
+                decision(currentBet);
+            } catch (NoSuchElementException e) {
+
+            }
+        }
+
+
         if (addBet > 0 && moneyStack >= addBet) {
             call(addBet);
             return addBet;
@@ -125,5 +152,9 @@ public class Player {
 
     public void setPlayerDecision(PlayerDecision playerDecision) {
         this.playerDecision = playerDecision;
+    }
+
+    public PlayerType getPlayerType() {
+        return playerType;
     }
 }

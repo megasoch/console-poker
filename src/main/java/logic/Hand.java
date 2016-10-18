@@ -25,7 +25,6 @@ public class Hand {
 
     @Override
     public String toString() {
-        return firstCard.getCardDenomination().toString() + "_" + firstCard.getCardSuit().toString()
-                + " " + secondCard.getCardDenomination().toString() + "_" + secondCard.getCardSuit().toString();
+        return "|| " + firstCard + " || " + secondCard + " ||";
     }
 }

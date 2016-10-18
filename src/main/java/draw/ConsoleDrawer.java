@@ -1,6 +1,7 @@
 package draw;
 
 import enums.PlayerDecision;
+import enums.PlayerType;
 import logic.Card;
 import logic.Game;
 import logic.Player;
@@ -26,17 +27,29 @@ public class ConsoleDrawer {
         } else {
             System.out.println("WINNER is " + winner.getName());
         }
+        System.out.println();
     }
 
     private static void drawPlayersList(Game game) {
         for (Player player: game.getPlayerList().getAllPlayers()) {
-            System.out.print(player.getName());
-            System.out.print(" Stack " + player.getMoneyStack());
-            System.out.print(" Decision: " + player.getPlayerDecision());
-            System.out.print(" Active: " + player.isActive());
-            System.out.print(" Playing hand: " + player.isPlayingHand());
-            if (player.getPlayerDecision().equals(PlayerDecision.CHECK) || player.getPlayerDecision().equals(PlayerDecision.CALL)) {
-                System.out.print(" Staged bet: " + player.getStagedBet());
+            System.out.print(player.getName() + "\t");
+            System.out.print(" Stack:" + player.getMoneyStack() + "\t");
+            if (player.isPlayingHand()) {
+                System.out.print(" Bet:" + player.getStagedBet() + "\t");
+            }
+
+            if (player.equals(game.getDealer())) {
+                System.out.print(" DEALER");
+            }
+            if (player.equals(game.getSmallBlindPlayer())) {
+                System.out.print(" SB");
+            }
+            if (player.equals(game.getBigBlindPlayer())) {
+                System.out.print(" BB");
+            }
+
+            if (player.getPlayerType().equals(PlayerType.PLAYER) && player.isActive()) {
+                System.out.print(" Hand: " + player.getHand());
             }
 
             System.out.println();
@@ -51,9 +64,11 @@ public class ConsoleDrawer {
             System.out.print(card.toString() + " || ");
         }
         System.out.println();
+        System.out.println();
     }
 
     private static void drawPot(Game game) {
-        System.out.println("Pot: " + game.getPot());
+        System.out.print("Pot:" + game.getPot() + "\t");
+        System.out.println("Blinds: " + game.getSmallBlind() + "/" + game.getBigBlind());
     }
 }
