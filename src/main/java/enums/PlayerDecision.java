@@ -9,5 +9,7 @@ public enum  PlayerDecision {
     CALL,
     PRE_BET,
     SMALL_BLIND,
-    BIG_BLIND
+    BIG_BLIND,
+    OUT,
+    HAS_NO_STACK_FOR_BET
 }

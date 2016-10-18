@@ -1,5 +1,7 @@
 package logic;
 
+import enums.PlayerDecision;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -23,25 +25,13 @@ public class PlayerListImpl implements PlayerList {
         this.dealerId = 0;
     }
 
-    public void beginBets(Player player) {
-        currentPlayerId = this.players.indexOf(player);
-        while (!players.get(currentPlayerId).isActive() || !players.get(currentPlayerId).isPlayingHand()) {
-            currentPlayerId = (currentPlayerId + 1) % players.size();
-        }
-        steps = 0;
-    }
-
     @Override
-    public boolean nextPlayer() {
-        while (true) {
-            currentPlayerId = (currentPlayerId + 1) % size();
-            steps++;
-            if (players.get(currentPlayerId).isActive() && players.get(currentPlayerId).isPlayingHand()) {
-                break;
-            }
-
+    public void nextPlayer() {
+        currentPlayerId++;
+        while (!players.get(currentPlayerId % players.size()).isPlayingHand()) {
+            currentPlayerId++;
         }
-        return steps < players.size();
+        currentPlayerId = currentPlayerId % players.size();
     }
 
     @Override
@@ -52,7 +42,7 @@ public class PlayerListImpl implements PlayerList {
     @Override
     public int size() {
         int res = 0;
-        for (Player player : players) {
+        for (Player player: players) {
             if (player.isActive()) {
                 res++;
             }
@@ -60,48 +50,75 @@ public class PlayerListImpl implements PlayerList {
         return res;
     }
 
-    public void nextRound() {
-        for (Player player : players) {
-            player.preRoundInitialize();
-        }
-        nextDealer();
-        steps = 0;
+    @Override
+    public void goToDealer() {
+        currentPlayerId = dealerId;
     }
 
+    @Override
     public Player getDealer() {
         return players.get(dealerId);
     }
 
+    @Override
     public void nextDealer() {
-        while (!players.get((++dealerId) % players.size()).isActive()) {
+        dealerId++;
+        while (!players.get(dealerId % players.size()).isActive()) {
+            dealerId++;
         }
         dealerId = dealerId % players.size();
         currentPlayerId = dealerId;
     }
 
+    @Override
     public List<Player> getAllPlayers() {
         return players;
     }
 
+    @Override
+    public void nextRound() {
+        for (Player player: players) {
+            if (player.isActive()) {
+                if (player.getMoneyStack() == 0) {
+                    player.setPlayerDecision(PlayerDecision.OUT);
+                } else {
+                    player.preRoundInitialize();
+                }
+            }
+        }
+        nextDealer();
+    }
+
+    @Override
     public int inRoundPlayersSize() {
         int res = 0;
-        for (Player player : players) {
-            if (player.isPlayingHand() && player.isActive()) {
+        for (Player player: players) {
+            if (player.isPlayingHand()) {
                 res++;
             }
         }
         return res;
     }
 
+    @Override
     public Player getWinner() {
-        if (inRoundPlayersSize() > 1) {
+        if(inRoundPlayersSize() > 1) {
             return null;
         }
-        for (Player player : players) {
-            if (player.isPlayingHand() && player.isActive()) {
+        for (Player player: players) {
+            if (player.isPlayingHand()) {
                 return player;
             }
         }
         return null;
+    }
+
+    @Override
+    public void updateStates() {
+        for (Player player: players) {
+            if (player.isPlayingHand() && player.getMoneyStack() == 0) {
+                player.setPlayerDecision(PlayerDecision.HAS_NO_STACK_FOR_BET);
+            }
+        }
     }
 }

@@ -34,9 +34,11 @@ public class Game {
         this.currentBet = 0;
     }
 
+
     public void run() throws InterruptedException, IOException {
         while (playerList.size() > 1) {
             Thread.sleep(1000);
+
             //GET CARD DECK
             //SHUFFLE
             cardDeck.prepareCardDeck();
@@ -46,13 +48,19 @@ public class Game {
             //BLINDS
             playerList.nextPlayer();
             smallBlindPlayer = playerList.getCurrentPlayer();
+            System.out.println("SB=" + playerList.getCurrentPlayer().getName());
             playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.SMALL_BLIND);
             pot += playerList.getCurrentPlayer().bet(smallBlind);
 
+            playerList.updateStates();
+
             playerList.nextPlayer();
             playerList.getCurrentPlayer().setPlayerDecision(PlayerDecision.BIG_BLIND);
+            System.out.println("BB=" + playerList.getCurrentPlayer().getName());
             pot += playerList.getCurrentPlayer().bet(bigBlind);
             currentBet = bigBlind;
+
+            playerList.updateStates();
 
             //Thread.sleep(1000);
             ConsoleDrawer.draw(this);
@@ -62,15 +70,15 @@ public class Game {
 
 
             //BETS(PRE FLOP)
-            playerList.nextPlayer();
-            playerList.beginBets(playerList.getCurrentPlayer());
-            if(!makeDecisions()) {
+            playerList.goToDealer();
+            if (!makeDecisions()) {
                 Player winner = playerList.getWinner();
                 winner.setMoneyStack(winner.getMoneyStack() + pot);
                 roundInitialization();
                 continue;
             }
 
+            playerList.updateStates();
 
             //FLOP
             table.add(cardDeck.getCard());
@@ -80,13 +88,15 @@ public class Game {
             ConsoleDrawer.draw(this);
 
             //BETS
-            playerList.beginBets(smallBlindPlayer);
-            if(!makeDecisions()) {
+            playerList.goToDealer();
+            if (!makeDecisions()) {
                 Player winner = playerList.getWinner();
                 winner.setMoneyStack(winner.getMoneyStack() + pot);
                 roundInitialization();
                 continue;
             }
+
+            playerList.updateStates();
 
             //TURN
             table.add(cardDeck.getCard());
@@ -94,13 +104,15 @@ public class Game {
             ConsoleDrawer.draw(this);
 
             //BETS
-            playerList.beginBets(smallBlindPlayer);
-            if(!makeDecisions()) {
+            playerList.goToDealer();
+            if (!makeDecisions()) {
                 Player winner = playerList.getWinner();
                 winner.setMoneyStack(winner.getMoneyStack() + pot);
                 roundInitialization();
                 continue;
             }
+
+            playerList.updateStates();
 
             //RIVER
             table.add(cardDeck.getCard());
@@ -108,17 +120,19 @@ public class Game {
             ConsoleDrawer.draw(this);
 
             //BETS
-            playerList.beginBets(smallBlindPlayer);
-            if(!makeDecisions()) {
+            playerList.goToDealer();
+            if (!makeDecisions()) {
                 Player winner = playerList.getWinner();
                 winner.setMoneyStack(winner.getMoneyStack() + pot);
                 roundInitialization();
                 continue;
             }
 
+            playerList.updateStates();
+
             //SHOWDOWN
             List<Player> winners = roundWinners();
-            for (Player player: winners) {
+            for (Player player : winners) {
                 System.out.println(player.getHighestCombination().getCombinationType() + " " + player.getHighestCombination());
                 player.setMoneyStack(player.getMoneyStack() + pot / winners.size());
             }
@@ -137,20 +151,23 @@ public class Game {
         for (Hand hand : hands) {
             hand.setFirstCard(cardDeck.getCard());
         }
+        playerList.goToDealer();
         for (Hand hand : hands) {
             hand.setSecondCard(cardDeck.getCard());
-            playerList.getCurrentPlayer().setHand(hand);
             playerList.nextPlayer();
+            playerList.getCurrentPlayer().setHand(hand);
         }
     }
 
     private boolean makeDecisions() {
-        do {
+        int curretnRoundPlayersSize = playerList.inRoundPlayersSize();
+        for (int i = 0; i < curretnRoundPlayersSize; i++) {
+            playerList.nextPlayer();
             pot += playerList.getCurrentPlayer().decision(currentBet);
             if (playerList.inRoundPlayersSize() == 1) {
                 return false;
             }
-        } while (playerList.nextPlayer());
+        }
         return true;
     }
 
@@ -158,15 +175,15 @@ public class Game {
         List<Card> cards = new ArrayList<>();
         List<Player> winners = new ArrayList<>();
         cards.addAll(table);
-        for (Player player: playerList.getAllPlayers()) {
+        for (Player player : playerList.getAllPlayers()) {
             if (player.isPlayingHand()) {
                 cards.add(player.getHand().getFirstCard());
                 cards.add(player.getHand().getSecondCard());
                 player.setHighestCombination(CombinationChecker.highestCombination(cards));
                 winners.add(player);
+                cards.remove(player.getHand().getFirstCard());
+                cards.remove(player.getHand().getSecondCard());
             }
-            cards.remove(player.getHand().getFirstCard());
-            cards.remove(player.getHand().getSecondCard());
         }
         Collections.sort(winners, new PlayerCombinationComparator());
         Collections.reverse(winners);

@@ -43,14 +43,11 @@ public class Player {
     }
 
     public boolean isPlayingHand() {
-        if (playerDecision.equals(PlayerDecision.FOLD)) {
-            return false;
-        }
-        return true;
+        return !playerDecision.equals(PlayerDecision.FOLD) && !playerDecision.equals(PlayerDecision.OUT);
     }
 
     public boolean isActive() {
-        return stagedBet + moneyStack > 0;
+        return !playerDecision.equals(PlayerDecision.OUT);
     }
 
     public void fold() {
@@ -72,8 +69,7 @@ public class Player {
 
     public int decision(int currentBet) {
         int addBet = currentBet - stagedBet;
-        if ((playerDecision.equals(PlayerDecision.SMALL_BLIND) || playerDecision.equals(PlayerDecision.BIG_BLIND)) && moneyStack == 0) {
-            check();
+        if (playerDecision.equals(PlayerDecision.HAS_NO_STACK_FOR_BET)) {
             return 0;
         }
         if (addBet == 0) {
