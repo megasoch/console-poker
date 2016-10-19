@@ -36,14 +36,14 @@ public class ConsoleDrawer {
             System.out.print(" Stack:" + player.getMoneyStack() + "\t");
             System.out.print(" Bet:" + player.getStagedBet() + "\t");
 
-            if (player.equals(game.getDealer())) {
-                System.out.print(" DEALER");
-            }
             if (player.equals(game.getSmallBlindPlayer())) {
-                System.out.print(" SB");
+                System.out.print(" SB\t");
             }
             if (player.equals(game.getBigBlindPlayer())) {
-                System.out.print(" BB");
+                System.out.print(" BB\t");
+            }
+            if (player.equals(game.getDealer())) {
+                System.out.print(" DEALER\t");
             }
 
             if (player.getPlayerType().equals(PlayerType.PLAYER) && player.isActive()) {
@@ -77,6 +77,10 @@ public class ConsoleDrawer {
             System.out.println(winner.getHighestCombination().getCombinationType() + " \t" + winner.getHighestCombination());
         }
         System.out.println();
+
+    }
+
+    public static void drawNewRound() {
         System.out.println("=================NEW ROUND==================");
     }
 }

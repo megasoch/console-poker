@@ -58,6 +58,16 @@ public class Combination implements Comparable {
         }
         Collections.sort(cards);
         Collections.sort(cmb.getCards());
+        if (combinationType.equals(CombinationType.STRAIGHT) ||
+                combinationType.equals(CombinationType.STRAIGHT_FLUSH)) {
+            if (cards.get(0).getCardDenomination().ordinal() > cmb.getCards().get(0).getCardDenomination().ordinal()) {
+                return 1;
+            }
+            if (cards.get(0).getCardDenomination().ordinal() > cmb.getCards().get(0).getCardDenomination().ordinal()) {
+                return -1;
+            }
+            return 0;
+        }
         if (combinationType.equals(CombinationType.FOUR_OF_A_KIND) ||
                 combinationType.equals(CombinationType.FULL_HOUSE) ||
                 combinationType.equals(CombinationType.TWO_PAIRS)) {

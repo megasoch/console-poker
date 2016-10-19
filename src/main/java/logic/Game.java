@@ -3,6 +3,7 @@ package logic;
 import comparators.PlayerCombinationComparator;
 import draw.ConsoleDrawer;
 import enums.PlayerDecision;
+import enums.PlayerType;
 import timer.BlindTimer;
 import utils.CombinationChecker;
 import utils.PlayersLoader;
@@ -24,10 +25,13 @@ public class Game {
     private Player dealer;
     private Player smallBlindPlayer;
     private Player bigBlindPlayer;
+    private BlindTimer blindTimer;
+
 
     public Game() throws IOException {
-        this.smallBlind = 10;
-        this.bigBlind = 20;
+        blindTimer = new BlindTimer();
+        this.smallBlind = BlindTimer.getSmallBlind();
+        this.bigBlind = BlindTimer.getBigBlind();
         this.pot = 0;
         this.playerList = new PlayerListImpl(PlayersLoader.loadPlayers());
         this.cardDeck = new CardDeck();
@@ -39,11 +43,10 @@ public class Game {
 
     public void run() throws InterruptedException, IOException {
         Timer timer = new Timer();
-        BlindTimer blindTimer = new BlindTimer();
         timer.schedule(blindTimer, BlindTimer.getBlindTime(), BlindTimer.getBlindTime());
 
         while (playerList.size() > 1) {
-
+            ConsoleDrawer.drawNewRound();
             //GET CARD DECK
             //SHUFFLE
             cardDeck.prepareCardDeck();
@@ -126,6 +129,7 @@ public class Game {
             roundInitialization();
         }
         ConsoleDrawer.drawWinner(this);
+        Thread.sleep(5000);
     }
 
     private void distributePot(List<Player> winners) {
@@ -170,7 +174,7 @@ public class Game {
         }
     }
 
-    private boolean makeDecisions() throws IOException {
+    private boolean makeDecisions() throws IOException, InterruptedException {
         int currentRoundPlayersSize = playerList.inRoundPlayersSize();
         for (int i = 0; i < currentRoundPlayersSize; i++) {
             playerList.nextPlayer();

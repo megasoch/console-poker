@@ -94,7 +94,7 @@ public class Player {
             } catch (InputMismatchException e) {
                 decision(currentBet);
             } catch (NoSuchElementException e) {
-
+                System.out.println("Process stopped!");
             }
         }
 
