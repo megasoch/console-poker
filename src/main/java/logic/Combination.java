@@ -63,7 +63,7 @@ public class Combination implements Comparable {
             if (cards.get(0).getCardDenomination().ordinal() > cmb.getCards().get(0).getCardDenomination().ordinal()) {
                 return 1;
             }
-            if (cards.get(0).getCardDenomination().ordinal() > cmb.getCards().get(0).getCardDenomination().ordinal()) {
+            if (cards.get(0).getCardDenomination().ordinal() < cmb.getCards().get(0).getCardDenomination().ordinal()) {
                 return -1;
             }
             return 0;
